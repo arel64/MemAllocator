@@ -9,7 +9,7 @@
 
 typedef struct listNode{
     void* key;
-    size_t length;
+    long length;
     struct listNode* next;
     struct listNode* prev;
 }ListNode;
@@ -18,6 +18,7 @@ typedef struct{
     ListNode* head;
     size_t size;
 }List;
+
 void initList(List*);
 void insertList(List*,ListNode*);
 void deleteList(List*,ListNode*);

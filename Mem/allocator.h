@@ -15,11 +15,13 @@
 
 extern List alocList;
 extern List freeList;
+extern void* lowAddress;
+extern void* maxAddress;
 
 void malloc_init();
 
 void* malloc(size_t size);
-void free(void* addr);
+void free(void*);
 
-int inListMem(size_t,ListNode*);
+int inListMem(unsigned long,ListNode*);
 #endif //MEMALLOCATOR_ALLOCATOR_H

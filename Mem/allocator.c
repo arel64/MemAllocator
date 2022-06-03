@@ -4,71 +4,77 @@
 
 #include <stdlib.h>
 #include "allocator.h"
-#define BAD_ALLOCATE -1
+#define MAX_MEMORY = 500;
+#define BAD_ALLOCATE 0xffffffffffffffff
+
 void malloc_init(){
 
-    ListNode *start = sbrk(sizeof(List));
-
-    if(*(int*)start ==BAD_ALLOCATE){
-        printf("No memory to init");
-        exit(1);
-    }
     //Init allocation and free linked lists
 
     initList(&alocList);
     initList(&freeList);
 
-
-    //Keep start of usable memory as head of list
-    start->key  = sbrk(0);
-    start->next =NULL;
-    start->prev =NULL;
-    alocList.head = start;
-    alocList.size = 0;
-
+    //Establish Memory Baselines
+    lowAddress = sbrk(500);
+    maxAddress = sbrk(0);
 }
-void* malloc(size_t size){
+void* malloc(unsigned long size){
 
-    ListNode* iter = alocList.head;
+    ListNode* iter = freeList.head;
 
     int status = inListMem(size,iter);
+    unsigned long totalSize;
+    ListNode* element;
     if(status == 1){
         /*
             Memory can be used from current size sbrk and iter points to the start of address
-            able to fit size +
+            able to fit size + sizeof(ListNode)
          */
-        ListNode* sep = iter->key;
-        //Create new allocation node, with appropriate size
-        sep->key = iter->key + sizeof(ListNode);
-        sep->length = size;
+        ListNode* temp;
+        totalSize = size  + sizeof(ListNode);
 
+        //We make sure free space is now less by totalSize as we will insert new header and element
+        element = iter->key - sizeof(ListNode);
+        element->length -= totalSize;
+
+
+        //This now points to the first free byte after the freeElement scope
+        temp = element + element->length ;
+        temp->length = totalSize;
+        temp->key = temp + sizeof(ListNode);
 
         //TODO if node is of 0 length remove it
-        //Free now points totalSize after initial location and has totalSize less free space
-        size_t totalSize = sep->length  + sizeof(ListNode);
-        iter->key = iter->key + totalSize;
-        iter->length = iter->length - totalSize;
 
-        //Add node into list
-        insertList(&alocList,sep);
+        /*
+            //Remove from free list
+            deleteList(&freeList,aloc);
+        */
 
-        return sep->key;
+        //Add node into allocation list
+        insertList(&alocList,temp);
+
+        return temp->key;
     }
     //No gap big enough found
 
 
-    void* start = sbrk(0);
-
     //This is the required additional memory to be allocated
-    long diffReq = (start - iter->key);
+    totalSize = size  + sizeof(ListNode);
+    void* start = sbrk(totalSize);
 
-    if(*(int*)sbrk(diffReq) == BAD_ALLOCATE){
+    // void* start = sbrk(totalSize);
+    if(start == BAD_ALLOCATE){
         return (void*)-1; //BAD!
     }
+    element = start;
+    element->length = totalSize;
+    element->key = start + sizeof (ListNode);
 
+    //Add node into allocation list
+    insertList(&alocList,element);
 
     //This is now a pointer to size length allocated memory
-    return start;
+    return element->key;
 
 }
 void free(void* addr){
@@ -78,7 +84,7 @@ void free(void* addr){
     }
 
     //Remember we offset the key by sizeof ListNode
-    void* key = addr - sizeof (ListNode);
+    void* key = addr;
 
     //Find the allocation node in aloclist and get a pointer to it
     ListNode* allocated = listSearch(&alocList,key);
@@ -93,8 +99,8 @@ void free(void* addr){
     }
 }
 
-
-int inListMem(size_t size,ListNode* iter){
+//TODO CHANGE TO MOST LEFT POINTER
+int inListMem(unsigned long size,ListNode* iter){
    iter = freeList.head;
    //Free list is empty, oby no space
    if(iter == NULL){
@@ -123,13 +129,4 @@ int inListMem(size_t size,ListNode* iter){
    iter = minValNode;
    return 1;
 
-}
-ListNode* listSearch(List* l,void* key){
-    ListNode* iter = l->head;
-    while(iter != NULL){
-        if(iter->key == key){
-            return iter;
-        }
-        iter = iter->next;
-    }
 }
