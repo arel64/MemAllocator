@@ -23,5 +23,5 @@ void malloc_init();
 void* malloc(size_t size);
 void free(void*);
 
-int inListMem(unsigned long,ListNode*);
+int inListMem(unsigned long,ListNode**);
 #endif //MEMALLOCATOR_ALLOCATOR_H

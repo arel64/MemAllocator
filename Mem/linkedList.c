@@ -6,7 +6,7 @@
 
 List alocList;
 List freeList;
-unsigned long baseLine;
+
 void initList(List* q){
     q->head = NULL;
     q->size = 0;
