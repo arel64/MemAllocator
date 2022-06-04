@@ -13,6 +13,8 @@
 #include <math.h>
 #include "linkedList.h"
 
+
+
 extern List alocList;
 extern List freeList;
 extern void* lowAddress;
@@ -23,5 +25,5 @@ void malloc_init();
 void* malloc(size_t size);
 void free(void*);
 
-int inListMem(unsigned long,ListNode**);
+int searchFreeMemoryBlock(unsigned long,ListNode **);
 #endif //MEMALLOCATOR_ALLOCATOR_H

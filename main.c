@@ -5,14 +5,14 @@ void setArray(char* arr,int length,char value);
 int main() {
 
     malloc_init();
-
+    //printf("banana %d",4);
     unsigned array_size = 50;
     char* arr = malloc(sizeof(char)*array_size);
     setArray(arr,array_size,'a');
     free(arr);
     arr=NULL;
     char* arr2 = malloc(sizeof(char)*array_size);
-    setArray(arr,array_size,'b');
+    setArray(arr2,array_size,'b');
 
 
 /*

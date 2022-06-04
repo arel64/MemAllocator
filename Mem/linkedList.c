@@ -14,7 +14,7 @@ void initList(List* q){
 ListNode* listSearch(List* l,void* key){
     ListNode* iter = l->head;
     while(iter != NULL){
-        if(iter->key == key){
+        if(getKey(iter) == key){
             return iter;
         }
         iter = iter->next;

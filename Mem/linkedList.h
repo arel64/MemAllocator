@@ -5,11 +5,11 @@
 #ifndef MEMALLOCATOR_LINKEDLIST_H
 #define MEMALLOCATOR_LINKEDLIST_H
 
+#include "globaldef.h"
 #include <stddef.h>
 
 typedef struct listNode{
-    void* key;
-    long length;
+    unsigned long length;
     struct listNode* next;
     struct listNode* prev;
 }ListNode;
