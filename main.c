@@ -5,11 +5,17 @@ void setArray(char* arr,int length,char value);
 int main() {
 
     malloc_init();
+
     unsigned array_size = 50;
     char* arr = malloc(sizeof(char)*array_size);
     setArray(arr,array_size,'a');
+    free(arr);
+    arr=NULL;
+    char* arr2 = malloc(sizeof(char)*array_size);
+    setArray(arr,array_size,'b');
 
 
+/*
 
     char* arr2 = malloc(sizeof(char)*array_size);
     setArray(arr2,array_size,'b');
@@ -33,7 +39,7 @@ int main() {
     free(small2);
     free(arr3);
     arr=small1=small2=arr3=NULL;
-
+*/
     return 0;
 }
 void setArray(char* arr,int length,char value){

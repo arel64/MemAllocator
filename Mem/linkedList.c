@@ -9,7 +9,6 @@ List freeList;
 
 void initList(List* q){
     q->head = NULL;
-    q->size = 0;
 }
 
 ListNode* listSearch(List* l,void* key){

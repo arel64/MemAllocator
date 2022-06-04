@@ -37,22 +37,31 @@ void* malloc(unsigned long size){
 
 
 
-    unsigned long totalSize;
-    ListNode* freeElement;
     if(status != 1) {
         //No data gap found, no space at this time
         return (void*)BAD_ALLOCATE;
     }
     /*
         Memory can be used from current size sbrk and iter points to the start of address
-        able to fit size + sizeof(ListNode)
+        able to fit size + 2*sizeof(ListNode)
      */
+    unsigned long totalSize;
+    ListNode* freeElement;
     ListNode* temp;
     totalSize = size  + sizeof(ListNode);
 
     //We make sure free space is now less by totalSize as we will insert new header and element
+
     freeElement = iter->key - sizeof(ListNode);
     freeElement->length -= totalSize;
+
+    //If we allocated all the node size, remove it.
+
+    if(freeElement->length == 0){
+        deleteList(&freeList,freeElement);
+    }
+
+
 
 
     //This now points to the first free byte after the freeElement scope
@@ -60,7 +69,7 @@ void* malloc(unsigned long size){
     temp->length = totalSize;
     temp->key = temp + 1; //One iteration means sizeof listnode
 
-    //TODO if node is of 0 length remove it
+
     //Add node into allocation list
     insertList(&alocList,temp);
 
@@ -93,11 +102,12 @@ int inListMem(unsigned long size,ListNode ** iterPtr){
     ListNode* iter = freeList.head;
    //Free list is empty, oby no space
    if(iter == NULL){
-       iter = NULL;
        return 0;
    }
+
    //Note that the total size is 2 Listnodes as there is need of length for both the header for the FreeList and AlocList.
    size_t totalSize = size + 2 * sizeof(ListNode);
+   size_t totalSizeExactFit = size + sizeof(ListNode);
    ListNode* minValNode = NULL;
    ListNode* prevNode = NULL;
 
@@ -106,15 +116,15 @@ int inListMem(unsigned long size,ListNode ** iterPtr){
            //This node is the smallest node to fit total size so far.
            minValNode = iter;
        }
+       if(totalSizeExactFit == iter->length){
+           //This is an exact fit, no need to test other blocks
+           *iterPtr = iter;
+           return 1;
+       }
        prevNode = iter;
        iter = iter->next;
    }
-   //The function sets iter to the value of first free node, or end of list otherwise
-    *iterPtr = prevNode;
 
-   if(minValNode == NULL){
-       return 0; //No fitting node found
-   }
    //A fitting node was found , return it
    *iterPtr = minValNode;
    return 1;

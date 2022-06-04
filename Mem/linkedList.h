@@ -16,7 +16,6 @@ typedef struct listNode{
 
 typedef struct{
     ListNode* head;
-    size_t size;
 }List;
 
 void initList(List*);
