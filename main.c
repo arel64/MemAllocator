@@ -3,9 +3,9 @@
 
 void setArray(char* arr,int length,char value);
 int main() {
-
     malloc_init();
-    //printf("banana %d",4);
+
+    printf("banana %d",4);
     unsigned array_size = 50;
     char* arr = malloc(sizeof(char)*array_size);
     setArray(arr,array_size,'a');
@@ -40,6 +40,7 @@ int main() {
     free(arr3);
     arr=small1=small2=arr3=NULL;
 */
+
     return 0;
 }
 void setArray(char* arr,int length,char value){

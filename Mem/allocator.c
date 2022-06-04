@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include "allocator.h"
 
-#define MAX_MEMORY 500
-#define BAD_ALLOCATE (-1)
 
 
 void* lowAddress;
@@ -42,6 +40,10 @@ void malloc_init(){
 
     insertList(&freeList,freeBaseLine);
 
+
+    //Init defragger without running
+
+    initDefragger(&freeList);
 }
 void* malloc(unsigned long size){
 
@@ -53,6 +55,7 @@ void* malloc(unsigned long size){
 
     if(status) {
         //No free block found, no space at this time
+        log("No free space to allocate",ERROR)
         return (void*)BAD_ALLOCATE;
     }
 
@@ -79,7 +82,7 @@ void* malloc(unsigned long size){
 
     //temp now points to adress where the alloc header is to be placed.
 
-    temp = getKey(freeElement) - sizeof(ListNode) + freeElement->length ;
+    temp = (void*) (getKey(freeElement) - sizeof(ListNode) + freeElement->length);
     temp->length = totalSize;
 
 
@@ -88,7 +91,7 @@ void* malloc(unsigned long size){
 
 
     //Address just after header to write into
-    return getKey(temp);
+    return (void*)getKey(temp);
 }
 //TODO add defrag
 void free(void* addr){

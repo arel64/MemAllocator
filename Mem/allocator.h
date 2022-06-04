@@ -11,8 +11,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <math.h>
-#include "linkedList.h"
+#include "defragger.h"
 
+#define BAD_ALLOCATE (-1)
+#define MAX_MEMORY 10000
 
 
 extern List alocList;
