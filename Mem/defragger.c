@@ -6,19 +6,82 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+
 pthread_t defragThread;
-pthread_mutex_t allocMutex;
+pthread_mutex_t freeMutex;
+pthread_mutex_t notifyMutex;
+pthread_cond_t freedMemoryCond = PTHREAD_COND_INITIALIZER;
+
+
+
+
 void initDefragger(List* freeList){
-    if(pthread_create(&defragThread,NULL,  defragFreeList,freeList)){
-        log("Unable to create defragThread Mutex.",CRITICAL)
+
+
+    if(pthread_mutex_init(&freeMutex,NULL)){
+        LOG("Unable to create defrag Thread Mutex.",CRITICAL)
         exit(1);
     }
-    if(pthread_mutex_init(&allocMutex,NULL)){
-        log("Unable to create defragThread Mutex.",CRITICAL);
+    if(pthread_mutex_init(&notifyMutex,NULL)){
+        LOG("Unable to create notify Thread Mutex.",CRITICAL)
         exit(1);
+    }
+    LOG("MUTEX CREATED",NOTE)
+
+    if(pthread_create(&defragThread,NULL, defragFreeList,freeList)){
+        LOG("Unable to create defrag Thread",ERROR)
+    }else{
+        LOG("DEFRAG INIT FINISHED",NOTE)
     }
 
 }
 void defragFreeList(List* freeList){
+    ListNode* iter;
+    ListNode* innerIter;
+    int joinedBlocks = 1;
+    LOG("DEFRAG RUNNING",NOTE)
 
+    while(joinedBlocks != 0 ||
+                pthread_cond_wait(&freedMemoryCond,&notifyMutex) ){
+
+        joinedBlocks = 0;
+        iter = freeList->head;
+
+        while (iter != NULL) {
+            innerIter = iter->next;
+            while (innerIter != NULL) {
+                pthread_mutex_lock(&freeMutex);
+
+                //contiguous check
+                //TODO: REFACTOR CODE DUPLICATION
+                if ((unsigned long) iter + iter->length == (unsigned long) innerIter) {
+                    joinedBlocks++;
+                    mergeInto(freeList, iter, innerIter);
+                    innerIter = iter;
+                    LOG("Joined 2 Blocks", NOTE)
+                } else if ((unsigned long) innerIter + innerIter->length == (unsigned long) iter) {
+                    joinedBlocks++;
+                    mergeInto(freeList, innerIter, iter);
+                    innerIter = iter;
+                    LOG("Joined 2 Blocks", NOTE)
+                }
+
+                pthread_mutex_unlock(&freeMutex);
+
+                innerIter = innerIter->next;
+            }
+            iter = iter->next;
+        }
+        LOG("DEFRAG INTERMIDIATE",NOTE)
+
+    }
+    LOG("DEFRAG FINISHED",WARNING)
+}
+
+
+//Merge extraBlock into mainBlock, not thread safe.
+static inline void mergeInto(List* freeList,ListNode* mainBlock, ListNode* extraBlock){
+    mainBlock->length += extraBlock->length;
+    deleteNodeList(freeList,extraBlock);
 }

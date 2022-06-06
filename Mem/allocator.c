@@ -9,7 +9,6 @@
 #include "allocator.h"
 
 
-
 void* lowAddress;
 void* maxAddress;
 
@@ -55,7 +54,7 @@ void* malloc(unsigned long size){
 
     if(status) {
         //No free block found, no space at this time
-        log("No free space to allocate",ERROR)
+        LOG("No free space to allocate",ERROR)
         return (void*)BAD_ALLOCATE;
     }
 
@@ -76,7 +75,7 @@ void* malloc(unsigned long size){
     //If we allocated all the node size, remove it.
 
     if(freeElement->length == 0){
-        deleteList(&freeList,freeElement);
+        deleteNodeList(&freeList, freeElement);
     }
 
 
@@ -93,7 +92,6 @@ void* malloc(unsigned long size){
     //Address just after header to write into
     return (void*)getKey(temp);
 }
-//TODO add defrag
 void free(void* addr){
 
 
@@ -106,15 +104,18 @@ void free(void* addr){
     void* key = addr;
 
     //Find the allocation node in aloclist and get a pointer to it
-    ListNode* allocated = listSearch(&alocList,key);
+    ListNode* allocated = searchList(&alocList,key);
     if(allocated!=NULL){
 
         //Delete from the aloc list
-        deleteList(&alocList,allocated);
+        deleteNodeList(&alocList, allocated);
 
         //Insert into the free list as this block is now free!
         insertList(&freeList,allocated);
     }
+
+    //pthread_cond_signal(&freedMemoryCond);
+
 }
 
 int searchFreeMemoryBlock(unsigned long size,ListNode ** iterPtr){

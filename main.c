@@ -1,28 +1,54 @@
 
 #include "Mem/allocator.h"
 
-void setArray(char* arr,int length,char value);
+void setArray(char* arr,unsigned length,char value);
 int main() {
     malloc_init();
 
-    printf("banana %d",4);
     unsigned array_size = 50;
     char* arr = malloc(sizeof(char)*array_size);
     setArray(arr,array_size,'a');
-    free(arr);
-    arr=NULL;
     char* arr2 = malloc(sizeof(char)*array_size);
     setArray(arr2,array_size,'b');
-
-
-/*
-
-    char* arr2 = malloc(sizeof(char)*array_size);
-    setArray(arr2,array_size,'b');
-
-
     char* arr3 = malloc(sizeof(char)*array_size);
     setArray(arr3,array_size,'c');
+
+    free(arr);
+    free(arr3);
+    free(arr2);
+
+    arr=NULL;
+    arr2=NULL;
+    arr3=NULL;
+
+    arr=NULL;
+    arr2=NULL;
+    arr3=NULL;
+    int count = 0;
+    while(count < 2000){
+
+        LOG("RUnning...",NOTE)
+        usleep(10);
+        count+=10;
+    }
+    char* arrA = malloc(sizeof(char)*array_size);
+    setArray(arrA,array_size,'a');
+    char* arrA2 = malloc(sizeof(char)*array_size);
+    setArray(arrA2,array_size,'b');
+    char* arrA3 = malloc(sizeof(char)*array_size);
+    setArray(arrA3,array_size,'c');
+
+    free(arrA);
+    free(arrA2);
+    free(arrA3);
+    while(1){
+
+        LOG("RUnning 2...",NOTE)
+        usleep(10);
+        count+=10;
+    }
+/*
+
 
 
     free(arr2);
@@ -43,7 +69,7 @@ int main() {
 
     return 0;
 }
-void setArray(char* arr,int length,char value){
+void setArray(char* arr,unsigned length,char value){
     for (int i = 0; i < length ; ++i) {
         arr[i] = value;
         if(i==length -1)

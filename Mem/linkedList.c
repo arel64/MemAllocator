@@ -11,7 +11,7 @@ void initList(List* q){
     q->head = NULL;
 }
 
-ListNode* listSearch(List* l,void* key){
+ListNode* searchList(List* l,void* key){
     ListNode* iter = l->head;
     while(iter != NULL){
         if(getKey(iter) == key){
@@ -22,7 +22,7 @@ ListNode* listSearch(List* l,void* key){
     return NULL;
 }
 
-void deleteList(List* l,ListNode* node){
+void deleteNodeList(List* l, ListNode* node){
     if(node->prev!=NULL){
         (node->prev)->next = node->next;
     }else{

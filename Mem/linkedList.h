@@ -20,7 +20,7 @@ typedef struct{
 
 void initList(List*);
 void insertList(List*,ListNode*);
-void deleteList(List*,ListNode*);
-ListNode* listSearch(List*,void* key);
+void deleteNodeList(List*, ListNode*);
+ListNode* searchList(List*,void* key);
 
 #endif //MEMALLOCATOR_LINKEDLIST_H

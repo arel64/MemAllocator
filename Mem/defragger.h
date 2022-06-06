@@ -7,11 +7,9 @@
 
 #include "linkedList.h"
 #include "pthread.h"
-extern pthread_t defragThread;
-extern pthread_mutex_t allocMutex;
 void initDefragger(List*);
 void defragFreeList(List*);
+static inline void mergeInto(List*,ListNode*, ListNode*);
 
-
-
+extern pthread_cond_t freedMemoryCond;
 #endif //MEMALLOCATOR_DEFRAGGER_H
