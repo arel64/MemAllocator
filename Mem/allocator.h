@@ -14,8 +14,7 @@
 #include "defragger.h"
 
 #define BAD_ALLOCATE (-1)
-#define MAX_MEMORY 10000
-
+#define BUFFER_SIZE (1024 + sizeof(ListNode))
 
 extern List alocList;
 extern List freeList;
@@ -27,5 +26,10 @@ void malloc_init();
 void* malloc(size_t size);
 void free(void*);
 
+int increaseAvailableMemory(unsigned long,ListNode**);
 int searchFreeMemoryBlock(unsigned long,ListNode **);
+
+
 #endif //MEMALLOCATOR_ALLOCATOR_H
+
+

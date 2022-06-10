@@ -6,6 +6,8 @@ set(GCC_COVERAGE_COMPILE_FLAGS "-Wall")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 
-add_executable(MemAllocator main.c Mem/allocator.c Mem/allocator.h Mem/linkedList.c Mem/linkedList.h Mem/globaldef.h Mem/defragger.c Mem/defragger.h Mem/log.h)
+add_executable(MemAllocator main.c Mem/allocator.c Mem/allocator.h Mem/linkedList.c Mem/linkedList.h Mem/globaldef.h Mem/defragger.c Mem/defragger.h Mem/log.h Test/tests.c)
 find_package(Threads REQUIRED)
-target_link_libraries(MemAllocator PRIVATE Threads::Threads)
+include(FetchCMocka.cmake)
+
+target_link_libraries(MemAllocator PRIVATE Threads::Threads cmocka-static m)

@@ -8,10 +8,7 @@
 #include <stdlib.h>
 #include "allocator.h"
 
-
-void* lowAddress;
-void* maxAddress;
-
+int isInit = 0;
 
 /**
  * Will establish a memory baseline and end in order to not interfere with system allocations
@@ -19,33 +16,21 @@ void* maxAddress;
  *
  */
 void malloc_init(){
-
     //Init allocation and free linked lists
 
     initList(&alocList);
     initList(&freeList);
 
-
-    //Establish Memory Baselines
-
-    lowAddress = sbrk(MAX_MEMORY);
-    maxAddress = sbrk(0);
-
-
     //Mark all space as free
+    isInit = 1;
 
-    ListNode* freeBaseLine = lowAddress;
-    freeBaseLine->length = MAX_MEMORY;
-
-    insertList(&freeList,freeBaseLine);
-
-
-    //Init defragger without running
 
     initDefragger(&freeList);
 }
 void* malloc(unsigned long size){
-
+    if(isInit != 1){
+        malloc_init();
+    }
     //Find a free memory block of appropriate size
 
     ListNode* freeElement;
@@ -53,18 +38,20 @@ void* malloc(unsigned long size){
 
 
     if(status) {
-        //No free block found, no space at this time
-        LOG("No free space to allocate",ERROR)
-        return (void*)BAD_ALLOCATE;
+        status = increaseAvailableMemory(size,&freeElement);
+        if(status){
+            return (void*)BAD_ALLOCATE;
+        }
     }
 
     /*
         Memory can be used from current size sbrk and iter points to the start of address
         able to fit size + 2 * sizeof(ListNode)
+        or size + sizeof(ListNode) in the case of an exact fit.
      */
 
     unsigned long totalSize = size  + sizeof(ListNode);
-    ListNode* temp;
+    ListNode* allocationNode;
 
 
     //We make sure free space is now less by totalSize as we will insert new header and element
@@ -81,16 +68,16 @@ void* malloc(unsigned long size){
 
     //temp now points to adress where the alloc header is to be placed.
 
-    temp = (void*) (getKey(freeElement) - sizeof(ListNode) + freeElement->length);
-    temp->length = totalSize;
+    allocationNode = (void*) (getKey(freeElement) - sizeof(ListNode) + freeElement->length);
+    allocationNode->length = totalSize;
 
 
     //Add node into allocation list
-    insertList(&alocList,temp);
+    insertList(&alocList,allocationNode);
 
 
     //Address just after header to write into
-    return (void*)getKey(temp);
+    return (void*)getKey(allocationNode);
 }
 void free(void* addr){
 
@@ -114,7 +101,7 @@ void free(void* addr){
         insertList(&freeList,allocated);
     }
 
-    //pthread_cond_signal(&freedMemoryCond);
+    pthread_cond_signal(&freedMemoryCond);
 
 }
 
@@ -149,8 +136,25 @@ int searchFreeMemoryBlock(unsigned long size,ListNode ** iterPtr){
        iter = iter->next;
    }
 
-   //A memory block was found , return it
-   *iterPtr = minValNode;
+   if(!minValNode){
+       return 1;
+   }
+    //A memory block was found , return it
+    *iterPtr = minValNode;
    return 0;
+}
+int increaseAvailableMemory(unsigned long size,ListNode** freeElement){
+    int amountOfBuffers = ceil((double)(size+sizeof(ListNode))/BUFFER_SIZE);
+    unsigned long totalSize = amountOfBuffers * BUFFER_SIZE;
 
+    void* res = sbrk(totalSize);
+    if(!res){
+        //No memory to be allocated(Possibly other problem)
+        return 1;
+    }
+
+    *freeElement = res;
+    (*freeElement)->length = totalSize;
+    insertList(&freeList,*freeElement);
+    return 0;
 }
