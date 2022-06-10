@@ -8,6 +8,6 @@
 #include "log.h"
 
 //This will return the data start value(After the allocation header)
-#define getKey(l) (unsigned long)l + sizeof(ListNode)
+#define getKey(l) (unsigned long) l + sizeof(ListNode)
 
-#endif //MEMALLOCATOR_GLOBALDEF_H
+#endif//MEMALLOCATOR_GLOBALDEF_H

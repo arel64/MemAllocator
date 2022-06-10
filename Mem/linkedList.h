@@ -8,19 +8,21 @@
 #include "globaldef.h"
 #include <stddef.h>
 
-typedef struct listNode{
-    unsigned long length;
-    struct listNode* next;
-    struct listNode* prev;
-}ListNode;
+typedef struct listNode
+{
+	unsigned long length;
+	struct listNode *next;
+	struct listNode *prev;
+} ListNode;
 
-typedef struct{
-    ListNode* head;
-}List;
+typedef struct
+{
+	ListNode *head;
+} List;
 
-void initList(List*);
-void insertList(List*,ListNode*);
-void deleteNodeList(List*, ListNode*);
-ListNode* searchList(List*,void* key);
+void initList(List *);
+void insertList(List *, ListNode *);
+void deleteNodeList(List *, ListNode *);
+ListNode *searchList(List *, void *key);
 
-#endif //MEMALLOCATOR_LINKEDLIST_H
+#endif//MEMALLOCATOR_LINKEDLIST_H
